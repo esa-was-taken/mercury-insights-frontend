@@ -1,19 +1,17 @@
-import { assertExpressionStatement } from "@babel/types";
-import React, { useState } from "react";
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    QueryClient,
-    QueryClientProvider,
-} from "react-query";
-
 import axios from "axios";
-import { Link, Outlet } from "react-router-dom";
+import { useState } from "react";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
 import { SocialIcon } from "react-social-icons";
-import { start } from "repl";
-import { endianness } from "os";
-import { resourceLimits } from "worker_threads";
+import {
+    DataGridPro,
+    GridCallbackDetails,
+    GridColDef,
+    GridFilterModel,
+    GridRenderCellParams,
+    GridSortModel,
+} from "@mui/x-data-grid-pro";
+import { UserFollowersDiff } from "../api/dtos";
 
 interface TrendingDto {
     id: string;
@@ -22,23 +20,38 @@ interface TrendingDto {
     difference: number;
 }
 
+const flatten = (
+    obj: UserFollowersDiff | { [s: string]: unknown } | ArrayLike<unknown>
+) =>
+    Object.assign(
+        {},
+        Object.fromEntries(
+            Object.values(obj)
+                .filter((x) => x && typeof x === "object")
+                .map((x) => Object.entries(x))
+                .flat(1)
+        ),
+        Object.fromEntries(
+            Object.entries(obj).filter(([, x]) => typeof x !== "object")
+        )
+    );
+
 const fetchTrending = async (interval: number) => {
     const start = new Date();
     start.setHours(start.getHours() - interval);
     const end = new Date();
 
-    const limit = 100;
+    // Round everything up to 5 minutes to allow for caching
+    var coeff = 1000 * 60 * 5;
+    const _start = new Date(Math.ceil(start.getTime() / coeff) * coeff);
+    const _end = new Date(Math.ceil(end.getTime() / coeff) * coeff);
 
-    const offset = 0;
-
-    return await axios.get<TrendingDto[]>(
+    return await axios.get<UserFollowersDiff[]>(
         "http://localhost:3001/user/trending",
         {
             params: {
-                start: start,
-                end: end,
-                limit: limit,
-                offset: offset,
+                start: _start,
+                end: _end,
             },
         }
     );
@@ -81,14 +94,47 @@ function Trending() {
         INTERVAL_OPTIONS[0].value
     );
 
+    const [gridSortModel, setGridSortModel] = useState<GridSortModel>([
+        { field: "difference", sort: "desc" },
+    ]);
+    const [gridFilterModel, setGridFilterModel] = useState<GridFilterModel>({
+        items: [],
+    });
+
     const query = useQuery(["trending", selectedInterval], () =>
         fetchTrending(selectedInterval)
     );
 
-    if (query.isLoading) return <div>Loading...</div>;
-    if (query.error) return <div>An error has occured. {query.error}</div>;
+    const loading = query.isLoading;
+    // if (query.isLoading) return <div>Loading...</div>;
+    // if (query.error) return <div>An error has occured. {query.error}</div>;
 
     const data = query.data?.data || [];
+    const rows = data.map((x) => flatten(x));
+    const columns: GridColDef[] = [
+        {
+            field: "username",
+            headerName: "Twitter",
+            renderCell: (params: GridRenderCellParams<string>) => (
+                <SocialIcon url={`https://twitter.com/${params.value}`} />
+            ),
+        },
+        { field: "difference", type: "number" },
+        { field: "name" },
+        { field: "followers", type: "number" },
+        { field: "followers_count", type: "number" },
+        { field: "following_count", type: "number" },
+        { field: "tweet_count", type: "number" },
+        { field: "listed_count", type: "number" },
+        { field: "createdAt", type: "dateTime" },
+        { field: "description" },
+        { field: "entities" },
+        { field: "location" },
+        { field: "protected", type: "boolean" },
+        { field: "verified", type: "boolean" },
+        { field: "marked", type: "boolean" },
+    ];
+
     return (
         <div>
             <div>
@@ -97,9 +143,10 @@ function Trending() {
                     name="intervals"
                     id="intervals"
                     value={selectedInterval}
-                    onChange={(e) =>
-                        setSelectedInterval(parseInt(e.target.value))
-                    }
+                    onChange={(e) => {
+                        console.log(e, parseInt(e.target.value));
+                        setSelectedInterval(parseInt(e.target.value));
+                    }}
                 >
                     {INTERVAL_OPTIONS.map((o) => (
                         <option key={o.value} value={o.value}>
@@ -108,7 +155,23 @@ function Trending() {
                     ))}
                 </select>
             </div>
-            <table>
+            <div style={{ height: 1000, width: "100%" }}>
+                <DataGridPro
+                    initialState={{
+                        sorting: { sortModel: gridSortModel },
+                        filter: { filterModel: gridFilterModel },
+                        pagination: {
+                            pageSize: 100,
+                        },
+                    }}
+                    pagination
+                    loading={loading}
+                    rows={rows}
+                    columns={columns}
+                ></DataGridPro>
+            </div>
+
+            {/* <table>
                 <thead>
                     <tr>
                         <th></th>
@@ -133,7 +196,7 @@ function Trending() {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </table> */}
         </div>
     );
 }

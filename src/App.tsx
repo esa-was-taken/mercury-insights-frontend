@@ -20,27 +20,35 @@ import Popular from "./routes/popular";
 import Trending from "./routes/trending";
 import User from "./routes/user";
 import Users from "./routes/users";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const queryClient = new QueryClient();
+const theme = createTheme({
+    palette: {
+        mode: "dark",
+    },
+});
 
 function App() {
     return (
         // Provide the client to your App
         <QueryClientProvider client={queryClient}>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Layout />}>
-                        <Route index element={<Home />} />
-                        <Route path="popular" element={<Popular />} />
-                        <Route path="trending" element={<Trending />} />
-                        <Route path="user" element={<Users />}>
-                            <Route path=":userName" element={<User />} />
-                        </Route>
+            <ThemeProvider theme={theme}>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Layout />}>
+                            <Route index element={<Home />} />
+                            <Route path="popular" element={<Popular />} />
+                            <Route path="trending" element={<Trending />} />
+                            <Route path="user" element={<Users />}>
+                                <Route path=":userName" element={<User />} />
+                            </Route>
 
-                        <Route path="*" element={<NoMatch />} />
-                    </Route>
-                </Routes>
-            </Router>
+                            <Route path="*" element={<NoMatch />} />
+                        </Route>
+                    </Routes>
+                </Router>
+            </ThemeProvider>
         </QueryClientProvider>
     );
 }

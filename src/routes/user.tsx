@@ -16,15 +16,15 @@ import { UserDto } from "../api/dtos";
 import Following from "../components/following";
 import Followers from "../components/followers";
 import { SocialIcon } from "react-social-icons";
+import { API_URL } from "../constants";
+import { Container } from "@mui/material";
 
 const fetchUser = async (userId: string) => {
-    return await axios.get<UserDto>(`http://localhost:3001/user/${userId}`);
+    return await axios.get<UserDto>(`${API_URL}/user/${userId}`);
 };
 
 const fetchUserByUsername = async (userName: string) => {
-    return await axios.get<UserDto>(
-        `http://localhost:3001/user/by/username/${userName}`
-    );
+    return await axios.get<UserDto>(`${API_URL}/user/by/username/${userName}`);
 };
 
 export default function User() {
@@ -45,10 +45,46 @@ export default function User() {
 
     return (
         <div>
-            <h2 className="User-username">
-                {user?.name}{" "}
-                <SocialIcon url={`https://twitter.com/${user?.username}`} />
-            </h2>
+            <div
+                className="User-profile"
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                <h2 className="User-username">
+                    <div>
+                        <img src={user?.metadata?.profile_image_url}></img>
+                    </div>{" "}
+                    {user?.name}{" "}
+                    <SocialIcon url={`https://twitter.com/${user?.username}`} />
+                </h2>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        maxWidth: 400,
+                    }}
+                >
+                    <div
+                        style={{
+                            maxWidth: 400,
+                            borderBottomWidth: 1,
+                            borderBottomStyle: "solid",
+                            marginBottom: "0.5em",
+                        }}
+                    >
+                        {user?.metadata?.description}
+                    </div>
+                    <div>
+                        Followers: {user?.public_metrics?.followers_count}
+                    </div>
+                    <div>Account created on: {user?.metadata?.createdAt}</div>
+                    <div>Marked: {user?.marked ? "yes" : "no"}</div>
+                </div>
+            </div>
+
             {user?.id && (
                 <div className="User-relationships">
                     <Following {...user}></Following>

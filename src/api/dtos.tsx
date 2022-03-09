@@ -3,7 +3,7 @@ export interface UserDto {
     name: string;
     username: string;
 }
-export interface User {
+export interface UserDto {
     id: string;
     name: string;
     username: string;
@@ -31,10 +31,10 @@ export interface UserPublicMetrics {
     listed_count?: number;
 }
 
-export interface UserWithFollowers extends User {
+export interface UserWithFollowers extends UserDto {
     followers: number;
 }
 
-export interface UserFollowersDiff extends User {
+export interface UserFollowersDiff extends UserDto {
     difference: number;
 }

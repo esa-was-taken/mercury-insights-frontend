@@ -13,19 +13,17 @@ import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
 import { UserDto } from "../api/dtos";
 import { SocialIcon } from "react-social-icons";
+import { API_URL } from "../constants";
 
 const fetchFollowing = async (userId: string) => {
     const limit = 100;
     const offset = 0;
-    return await axios.get<UserDto[]>(
-        `http://localhost:3001/user/${userId}/following`,
-        {
-            params: {
-                limit: limit,
-                offset: offset,
-            },
-        }
-    );
+    return await axios.get<UserDto[]>(`${API_URL}/user/${userId}/following`, {
+        params: {
+            limit: limit,
+            offset: offset,
+        },
+    });
 };
 
 const Following = (user: UserDto) => {

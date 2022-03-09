@@ -20,6 +20,7 @@ import {
     GridRenderCellParams,
     GridSortModel,
 } from "@mui/x-data-grid-pro";
+import { API_URL } from "../constants";
 
 interface PopularDto {
     id: string;
@@ -44,9 +45,7 @@ const flatten = (
 };
 
 const fetchPopular = async () => {
-    return await axios.get<UserWithFollowers[]>(
-        "http://localhost:3001/user/popular"
-    );
+    return await axios.get<UserWithFollowers[]>(`${API_URL}/user/popular`);
 };
 
 function Popular() {
@@ -67,25 +66,32 @@ function Popular() {
     });
     const columns: GridColDef[] = [
         {
+            field: "followers",
+            type: "number",
+            headerName: "(Marked) Followers",
+        },
+        {
             field: "username",
-            headerName: "Twitter",
+            headerName: "Username",
             renderCell: (params: GridRenderCellParams<string>) => (
-                <SocialIcon url={`https://twitter.com/${params.value}`} />
+                <div>
+                    <div className="User-link">
+                        <Link to={`/user/${params.value}`}>{params.value}</Link>
+                    </div>
+                </div>
             ),
         },
-        { field: "followers", type: "number" },
-        { field: "name" },
-        { field: "followers_count", type: "number" },
-        { field: "following_count", type: "number" },
-        { field: "tweet_count", type: "number" },
-        { field: "listed_count", type: "number" },
-        { field: "createdAt", type: "dateTime" },
-        { field: "description" },
-        { field: "entities" },
-        { field: "location" },
-        { field: "protected", type: "boolean" },
-        { field: "verified", type: "boolean" },
-        { field: "marked", type: "boolean" },
+        { field: "followers_count", type: "number", headerName: "Followers" },
+        { field: "following_count", type: "number", headerName: "Following" },
+        { field: "tweet_count", type: "number", headerName: "Tweets" },
+        { field: "listed_count", type: "number", headerName: "Listed" },
+        { field: "createdAt", type: "dateTime", headerName: "Acc. Created At" },
+        { field: "verified", type: "boolean", headerName: "Verified" },
+        { field: "marked", type: "boolean", headerName: "Marked" },
+        { field: "description", headerName: "Profile Desc." },
+        { field: "entities", headerName: "Entities" },
+        { field: "location", headerName: "Location" },
+        { field: "protected", type: "boolean", headerName: "Protected" },
     ];
 
     return (

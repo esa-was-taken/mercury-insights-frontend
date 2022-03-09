@@ -12,6 +12,7 @@ import {
     GridSortModel,
 } from "@mui/x-data-grid-pro";
 import { UserFollowersDiff } from "../api/dtos";
+import { API_URL } from "../constants";
 
 interface TrendingDto {
     id: string;
@@ -46,15 +47,12 @@ const fetchTrending = async (interval: number) => {
     const _start = new Date(Math.ceil(start.getTime() / coeff) * coeff);
     const _end = new Date(Math.ceil(end.getTime() / coeff) * coeff);
 
-    return await axios.get<UserFollowersDiff[]>(
-        "http://localhost:3001/user/trending",
-        {
-            params: {
-                start: _start,
-                end: _end,
-            },
-        }
-    );
+    return await axios.get<UserFollowersDiff[]>(`${API_URL}/user/trending`, {
+        params: {
+            start: _start,
+            end: _end,
+        },
+    });
 };
 
 const INTERVAL_OPTIONS = [
@@ -112,27 +110,34 @@ function Trending() {
     const data = query.data?.data || [];
     const rows = data.map((x) => flatten(x));
     const columns: GridColDef[] = [
+        { field: "difference", type: "number", headerName: "Score" },
         {
             field: "username",
-            headerName: "Twitter",
+            headerName: "Username",
             renderCell: (params: GridRenderCellParams<string>) => (
-                <SocialIcon url={`https://twitter.com/${params.value}`} />
+                <div>
+                    <div className="User-link">
+                        <Link to={`/user/${params.value}`}>{params.value}</Link>
+                    </div>
+                </div>
             ),
         },
-        { field: "difference", type: "number" },
-        { field: "name" },
-        { field: "followers", type: "number" },
-        { field: "followers_count", type: "number" },
-        { field: "following_count", type: "number" },
-        { field: "tweet_count", type: "number" },
-        { field: "listed_count", type: "number" },
-        { field: "createdAt", type: "dateTime" },
-        { field: "description" },
-        { field: "entities" },
-        { field: "location" },
-        { field: "protected", type: "boolean" },
-        { field: "verified", type: "boolean" },
-        { field: "marked", type: "boolean" },
+        {
+            field: "followers",
+            type: "number",
+            headerName: "(Marked) Followers",
+        },
+        { field: "followers_count", type: "number", headerName: "Followers" },
+        { field: "following_count", type: "number", headerName: "Following" },
+        { field: "tweet_count", type: "number", headerName: "Tweets" },
+        { field: "listed_count", type: "number", headerName: "Listed" },
+        { field: "createdAt", type: "dateTime", headerName: "Acc. Created At" },
+        { field: "verified", type: "boolean", headerName: "Verified" },
+        { field: "marked", type: "boolean", headerName: "Marked" },
+        { field: "description", headerName: "Profile Desc." },
+        { field: "entities", headerName: "Entities" },
+        { field: "location", headerName: "Location" },
+        { field: "protected", type: "boolean", headerName: "Protected" },
     ];
 
     return (

@@ -21,6 +21,9 @@ import Trending from "./routes/trending";
 import User from "./routes/user";
 import Users from "./routes/users";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Tweets from "./routes/tweets";
+import TrendingTweets from "./routes/trendingTweets";
+import Tweet from "./routes/tweet";
 
 const queryClient = new QueryClient();
 const theme = createTheme({
@@ -40,10 +43,13 @@ function App() {
                             <Route index element={<Home />} />
                             <Route path="popular" element={<Popular />} />
                             <Route path="trending" element={<Trending />} />
+                            <Route path="tweets" element={<TrendingTweets />} />
+                            <Route path="tweet" element={<Tweets />}>
+                                <Route path=":tweetId" element={<Tweet />} />
+                            </Route>
                             <Route path="user" element={<Users />}>
                                 <Route path=":userName" element={<User />} />
                             </Route>
-
                             <Route path="*" element={<NoMatch />} />
                         </Route>
                     </Routes>
@@ -69,6 +75,9 @@ function Layout() {
                         </li>
                         <li>
                             <Link to="/trending">Trending</Link>
+                        </li>
+                        <li>
+                            <Link to="/tweets">Tweets</Link>
                         </li>
                     </ul>
                 </nav>

@@ -1,3 +1,5 @@
+import { NumberLiteralType } from "typescript";
+
 export interface UserDto {
     id: string;
     name: string;
@@ -32,9 +34,11 @@ export interface UserPublicMetrics {
 }
 
 export interface UserWithFollowers extends UserDto {
+    marked_followers_ratio: number;
     followers: number;
 }
 
 export interface UserFollowersDiff extends UserDto {
+    marked_followers_ratio: number;
     difference: number;
 }

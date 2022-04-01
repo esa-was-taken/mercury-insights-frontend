@@ -71,6 +71,11 @@ function Popular() {
             headerName: "(Marked) Followers",
         },
         {
+            field: "marked_followers_ratio",
+            type: "number",
+            headerName: "Ratio Marked Followers",
+        },
+        {
             field: "username",
             headerName: "Username",
             renderCell: (params: GridRenderCellParams<string>) => (

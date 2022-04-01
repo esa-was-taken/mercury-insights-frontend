@@ -127,6 +127,11 @@ function Trending() {
             type: "number",
             headerName: "(Marked) Followers",
         },
+        {
+            field: "marked_followers_ratio",
+            type: "number",
+            headerName: "Ratio Marked Followers",
+        },
         { field: "followers_count", type: "number", headerName: "Followers" },
         { field: "following_count", type: "number", headerName: "Following" },
         { field: "tweet_count", type: "number", headerName: "Tweets" },

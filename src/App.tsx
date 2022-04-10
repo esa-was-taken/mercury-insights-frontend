@@ -24,6 +24,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Tweets from "./routes/tweets";
 import TrendingTweets from "./routes/trendingTweets";
 import Tweet from "./routes/tweet";
+import MarkedUsers from "./routes/markedUsers";
 
 const queryClient = new QueryClient();
 const theme = createTheme({
@@ -50,6 +51,10 @@ function App() {
                             <Route path="user" element={<Users />}>
                                 <Route path=":userName" element={<User />} />
                             </Route>
+                            <Route
+                                path="admin"
+                                element={<MarkedUsers />}
+                            ></Route>
                             <Route path="*" element={<NoMatch />} />
                         </Route>
                     </Routes>
@@ -78,6 +83,9 @@ function Layout() {
                         </li>
                         <li>
                             <Link to="/tweets">Tweets</Link>
+                        </li>
+                        <li>
+                            <Link to="/admin">Admin</Link>
                         </li>
                     </ul>
                 </nav>

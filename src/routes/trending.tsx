@@ -38,21 +38,7 @@ const flatten = (
     );
 
 const fetchTrending = async (interval: number) => {
-    const start = new Date();
-    start.setHours(start.getHours() - interval);
-    const end = new Date();
-
-    // Round everything up to 5 minutes to allow for caching
-    var coeff = 1000 * 60 * 5;
-    const _start = new Date(Math.ceil(start.getTime() / coeff) * coeff);
-    const _end = new Date(Math.ceil(end.getTime() / coeff) * coeff);
-
-    return await axios.get<UserFollowersDiff[]>(`${API_URL}/user/trending`, {
-        params: {
-            start: _start,
-            end: _end,
-        },
-    });
+    return await axios.get<UserFollowersDiff[]>(`${API_URL}/user/trending/${interval}`);
 };
 
 const INTERVAL_OPTIONS = [

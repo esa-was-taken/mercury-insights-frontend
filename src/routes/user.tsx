@@ -18,6 +18,7 @@ import Followers from "../components/followers";
 import { SocialIcon } from "react-social-icons";
 import { API_URL } from "../constants";
 import { Container } from "@mui/material";
+import LikedBy from "../components/likedBy";
 
 const fetchUser = async (userId: string) => {
     return await axios.get<UserDto>(`${API_URL}/user/${userId}`);
@@ -90,6 +91,7 @@ export default function User() {
                     <Following {...user}></Following>
 
                     <Followers {...user}></Followers>
+                    <LikedBy {...user}></LikedBy>
                 </div>
             )}
         </div>

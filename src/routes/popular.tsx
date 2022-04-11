@@ -53,7 +53,7 @@ function Popular() {
     const query = useQuery("popular", fetchPopular);
 
     const [gridSortModel, setGridSortModel] = useState<GridSortModel>([
-        { field: "followers", sort: "desc" },
+        { field: "weighted_marked_followers", sort: "desc" },
     ]);
     const [gridFilterModel, setGridFilterModel] = useState<GridFilterModel>({
         items: [],
@@ -66,9 +66,14 @@ function Popular() {
     });
     const columns: GridColDef[] = [
         {
-            field: "followers",
+            field: "weighted_marked_followers",
             type: "number",
-            headerName: "(Marked) Followers",
+            headerName: "Weighted Marked Followers",
+        },
+        {
+            field: "marked_followers",
+            type: "number",
+            headerName: "Marked Followers",
         },
         {
             field: "marked_followers_ratio",

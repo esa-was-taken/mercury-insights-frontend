@@ -19,6 +19,7 @@ interface TrendingDto {
     name: string;
     username: string;
     difference: number;
+    weighted_difference: number;
 }
 
 const flatten = (
@@ -38,7 +39,9 @@ const flatten = (
     );
 
 const fetchTrending = async (interval: number) => {
-    return await axios.get<UserFollowersDiff[]>(`${API_URL}/user/trending/${interval}`);
+    return await axios.get<UserFollowersDiff[]>(
+        `${API_URL}/user/trending/${interval}`
+    );
 };
 
 const INTERVAL_OPTIONS = [
@@ -79,7 +82,7 @@ function Trending() {
     );
 
     const [gridSortModel, setGridSortModel] = useState<GridSortModel>([
-        { field: "difference", sort: "desc" },
+        { field: "weighted_difference", sort: "desc" },
     ]);
     const [gridFilterModel, setGridFilterModel] = useState<GridFilterModel>({
         items: [],
@@ -96,6 +99,11 @@ function Trending() {
     const data = query.data?.data || [];
     const rows = data.map((x) => flatten(x));
     const columns: GridColDef[] = [
+        {
+            field: "weighted_difference",
+            type: "number",
+            headerName: "Weighted score",
+        },
         { field: "difference", type: "number", headerName: "Score" },
         {
             field: "username",

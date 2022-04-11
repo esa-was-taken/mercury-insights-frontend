@@ -1,13 +1,15 @@
-import { Button, TextField } from "@mui/material";
+import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { API_URL } from "../constants";
+import EditWeight from "../components/editWeight";
 
 interface UserDto {
     username: string;
     name: string;
     marked: boolean;
+    markedWeight: number;
 }
 
 const fetchMarkedUsers = async () => {
@@ -54,7 +56,6 @@ export default function MarkedUsers() {
 
     return (
         <div>
-            TODO: Add management of marked user weight/score
             <h3>Marked users</h3>
             <TextField
                 id="outlined-basic"
@@ -76,6 +77,7 @@ export default function MarkedUsers() {
                 <thead>
                     <tr>
                         <th></th>
+                        <th>Weight</th>
                         <th>Username</th>
                         <th>Name</th>
                     </tr>
@@ -103,6 +105,12 @@ export default function MarkedUsers() {
                                     >
                                         Unmark
                                     </Button>
+                                </td>
+                                <td>
+                                    <EditWeight
+                                        username={user.username}
+                                        weight={user.markedWeight}
+                                    />
                                 </td>
                                 <td>{user.username}</td>
                                 <td>{user.name}</td>

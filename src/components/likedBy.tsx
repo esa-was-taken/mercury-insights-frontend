@@ -1,22 +1,17 @@
-import { useParams } from "react-router-dom";
-import { assertExpressionStatement } from "@babel/types";
-import React, { useState } from "react";
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    QueryClient,
-    QueryClientProvider,
-} from "react-query";
-
 import axios from "axios";
-import { Link, Outlet } from "react-router-dom";
-import { UserDto } from "../api/dtos";
+import React from "react";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
 import { SocialIcon } from "react-social-icons";
+import { UserDto, UserLikedByDto } from "../api/dtos";
 import { API_URL } from "../constants";
+import { dateFormatShort } from "../utils";
+import { Username } from "./username";
 
 const fetchUserLikedBy = async (userName: string) => {
-    return await axios.get<UserDto[]>(`${API_URL}/user/${userName}/likedBy`);
+    return await axios.get<UserLikedByDto[]>(
+        `${API_URL}/user/${userName}/likedBy`
+    );
 };
 
 export default function LikedBy(user: UserDto) {
@@ -26,7 +21,8 @@ export default function LikedBy(user: UserDto) {
     if (userLikedByQuery.isLoading) return <div>Loading...</div>;
     if (userLikedByQuery.error)
         return <div>An error has occured. {userLikedByQuery.error}</div>;
-    const users = userLikedByQuery.data?.data || [];
+    const users =
+        userLikedByQuery.data?.data.sort((a, b) => b.addedAt - a.addedAt) || [];
 
     return (
         <div>
@@ -36,6 +32,7 @@ export default function LikedBy(user: UserDto) {
                     <tr>
                         <th></th>
                         <th>Name</th>
+                        <th>Added on</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,10 +44,12 @@ export default function LikedBy(user: UserDto) {
                                 />
                             </td>
                             <td className="User-link">
-                                <Link to={`/user/${user.username}`}>
-                                    {user.name}
-                                </Link>
+                                <Username
+                                    username={user.username}
+                                    name={user.name}
+                                />
                             </td>
+                            <td>{dateFormatShort(new Date(user.addedAt))}</td>
                         </tr>
                     ))}
                 </tbody>

@@ -43,3 +43,9 @@ export interface UserFollowersDiff extends UserDto {
     marked_followers_ratio: number;
     difference: number;
 }
+
+export interface UserFollowerDto extends UserDto {
+    addedAt: number;
+}
+
+export interface UserLikedByDto extends UserFollowerDto {}

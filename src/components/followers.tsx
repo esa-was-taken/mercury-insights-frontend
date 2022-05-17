@@ -1,50 +1,78 @@
-import { useParams } from "react-router-dom";
-import { assertExpressionStatement } from "@babel/types";
-import React, { useState } from "react";
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    QueryClient,
-    QueryClientProvider,
-} from "react-query";
-
+import { Button } from "@mui/material";
 import axios from "axios";
-import { Link, Outlet } from "react-router-dom";
-import { UserDto } from "../api/dtos";
+import { useState } from "react";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
 import { SocialIcon } from "react-social-icons";
+import { UserDto, UserFollowerDto } from "../api/dtos";
 import { API_URL } from "../constants";
+import { dateFormatShort } from "../utils";
+import { Username } from "./username";
 
 const fetchFollowers = async (userId: string) => {
     const limit = 100;
     const offset = 0;
 
-    return await axios.get<UserDto[]>(`${API_URL}/user/${userId}/followers`, {
-        params: {
-            limit: limit,
-            offset: offset,
-        },
-    });
+    return await axios.get<UserFollowerDto[]>(
+        `${API_URL}/user/${userId}/followers`,
+        {
+            params: {
+                limit: limit,
+                offset: offset,
+            },
+        }
+    );
+};
+
+const fetchRemovedFollowers = async (userId: string) => {
+    const limit = 100;
+    const offset = 0;
+
+    return await axios.get<UserFollowerDto[]>(
+        `${API_URL}/user/${userId}/followers/removed`,
+        {
+            params: {
+                limit: limit,
+                offset: offset,
+            },
+        }
+    );
 };
 
 export default function Followers(user: UserDto) {
+    const [showRemoved, setShowRemoved] = useState(false);
+
     const userId = user.id;
-    const followersQuery = useQuery(["followers", userId], () =>
-        fetchFollowers(userId)
-    );
+    const followersQuery = useQuery(["followers", userId, showRemoved], () => {
+        return showRemoved
+            ? fetchRemovedFollowers(userId)
+            : fetchFollowers(userId);
+    });
+
     if (followersQuery.isLoading) return <div>Loading...</div>;
     if (followersQuery.error)
         return <div>An error has occured. {followersQuery.error}</div>;
-    const followers = followersQuery.data?.data || [];
+    const followers =
+        followersQuery.data?.data.sort((a, b) => b.addedAt - a.addedAt) || [];
 
     return (
         <div>
-            <h3>Followers</h3>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                    variant="outlined"
+                    onClick={() => {
+                        setShowRemoved(!showRemoved);
+                    }}
+                >
+                    <b>Followers</b>: {showRemoved ? "Removed" : "Added"}
+                </Button>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th></th>
                         <th>Name</th>
+                        <th>{showRemoved ? "Removed on" : "Added on"}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,10 +84,12 @@ export default function Followers(user: UserDto) {
                                 />
                             </td>
                             <td className="User-link">
-                                <Link to={`/user/${user.username}`}>
-                                    {user.name}
-                                </Link>
+                                <Username
+                                    username={user.username}
+                                    name={user.name}
+                                />
                             </td>
+                            <td>{dateFormatShort(new Date(user.addedAt))}</td>
                         </tr>
                     ))}
                 </tbody>
